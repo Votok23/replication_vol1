@@ -1,0 +1,10 @@
+[mysqld]
+server-id=2
+log-bin=mysql-bin
+binlog-format=ROW
+gtid-mode=ON
+enforce-gtid-consistency=ON
+auto-increment-increment=2
+auto-increment-offset=2
+relay-log=mysql-relay-bin
+log-slave-updates=ON
