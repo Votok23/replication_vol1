@@ -1,0 +1,52 @@
+
+services:
+  mysql-master:
+    image: mysql:8.0
+    container_name: mysql-master
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: r2d2
+      MYSQL_PASSWORD: 123
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./master-data:/var/lib/mysql
+      - ./master-config:/etc/mysql/conf.d
+    networks:
+      - mysql-replication-net
+    command:
+      - --server-id=1
+      - --log-bin=mysql-bin
+      - --binlog-format=ROW
+      - --gtid-mode=ON
+      - --enforce-gtid-consistency=ON
+
+  mysql-slave:
+    image: mysql:8.0
+    container_name: mysql-slave
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: r2d2
+      MYSQL_PASSWORD: 123
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./slave-data:/var/lib/mysql
+      - ./slave-config:/etc/mysql/conf.d
+    networks:
+      - mysql-replication-net
+    depends_on:
+      - mysql-master
+    command:
+      - --server-id=2
+      - --log-bin=mysql-bin
+      - --binlog-format=ROW
+      - --gtid-mode=ON
+      - --enforce-gtid-consistency=ON
+      - --skip-slave-start
+
+networks:
+  mysql-replication-net:
+    driver: bridge
